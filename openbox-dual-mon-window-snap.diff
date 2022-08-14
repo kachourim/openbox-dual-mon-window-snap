@@ -14,7 +14,7 @@ index 11a01400..a69c25ec 100644
      gboolean skip_pager;
      /*! The window should not be displayed by taskbars */
 diff --git a/openbox/moveresize.c b/openbox/moveresize.c
-index d12a64de..c55bd740 100644
+index d12a64de..601ef4ab 100644
 --- a/openbox/moveresize.c
 +++ b/openbox/moveresize.c
 @@ -372,7 +372,7 @@ void moveresize_end(gboolean cancel)
@@ -26,7 +26,7 @@ index d12a64de..c55bd740 100644
  
      if (keyboard) resist = keydist - 1; /* resist for one key press */
      else resist = config_resist_win;
-@@ -380,6 +380,156 @@ static void do_move(gboolean keyboard, gint keydist)
+@@ -380,6 +380,164 @@ static void do_move(gboolean keyboard, gint keydist)
      if (!keyboard) resist = config_resist_edge;
      resist_move_monitors(moveresize_client, resist, &cur_x, &cur_y);
  
@@ -36,26 +36,25 @@ index d12a64de..c55bd740 100644
 +
 +    int nm = screen_num_monitors; //get number of monitors
 +
-+    gint height, h1, h2, t1, t2;
-+    gint width, w1, w2;
++    gint t1, t2;
++    gint w1, w2;
 +    int top_snap, top_snap_release, left_snap, right_snap, left_snap_release, right_snap_release;
-+    int pw = 20; // number of pixels to trigger snapping
++    int pw = 5; // number of pixels to trigger snapping
 +
 +    if (nm==1)
 +    {
 +        const Rect *a = screen_physical_area_active();
 +        t1 = RECT_TOP(*a);
-+        height = RECT_BOTTOM(*a) - t1;
-+        width = RECT_RIGHT(*a) - RECT_LEFT(*a);
++        w1 = RECT_RIGHT(*a) - RECT_LEFT(*a);
 +
 +        top_snap = (y == t1); // test if in range to snap top
 +        top_snap_release = (y > t1); // test if in range to release snap top
 +
 +        left_snap  = x >= 0 && x < pw; // test if in range to snap left
-+        right_snap = x > width - pw && x <= width; // test if in range to snap right
++        right_snap = x > w1 - pw && x <= w1; // test if in range to snap right
 +
-+        left_snap_release  = x > pw && x < width; // test if in range to release snap left
-+        right_snap_release = x > 0 && x < width-pw; // test if in range to release snap right
++        left_snap_release  = x > pw && x < w1; // test if in range to release snap left
++        right_snap_release = x > 0 && x < w1-pw; // test if in range to release snap right
 +    }
 +    else if (nm==2)
 +    {
@@ -63,9 +62,7 @@ index d12a64de..c55bd740 100644
 +        const Rect *a2 = screen_physical_area_monitor(2);
 +        t1 = RECT_TOP(*a1);
 +        t2 = RECT_TOP(*a2);
-+        h1 = RECT_BOTTOM(*a1) - t1;
 +        w1 = RECT_RIGHT(*a1) - RECT_LEFT(*a1);
-+        h2 = RECT_BOTTOM(*a2) - t2;
 +        w2 = RECT_RIGHT(*a2) - RECT_LEFT(*a2) - w1 - 1;
 +
 +        if (x < w1) {
@@ -98,6 +95,8 @@ index d12a64de..c55bd740 100644
 +        cur_h = moveresize_client->area.height;
 +    }
 +    else if (top_snap && !moveresize_client->snapped_left && !moveresize_client->snapped_right) {
++        moveresize_client->pre_max_area.width = cur_w;
++        moveresize_client->pre_max_area.height = cur_h;
 +        client_maximize(moveresize_client, TRUE, 0);
 +    }
 +    else if (left_snap && !moveresize_client->snapped_left && !moveresize_client->max_horz && !moveresize_client->max_vert) {
@@ -140,17 +139,26 @@ index d12a64de..c55bd740 100644
 +        client_maximize(moveresize_client, FALSE, 2);
 +        moveresize_client->snapped_right = FALSE;
 +    }
++    else if (!moveresize_client->snapped_right && !moveresize_client->snapped_left && moveresize_client->max_vert && !moveresize_client->max_horz) {
++        cur_h = moveresize_client->pre_max_area.height;
++        cur_w = moveresize_client->pre_max_area.width;
++        if (cur_w == 0){
++            if (x < w1) cur_w = w1/2;
++            else cur_w = w2/2;
++        }
++        client_maximize(moveresize_client, FALSE, 2);
++    }
 +
 +    if (nm==1){
 +        if (moveresize_client->snapped_left) {
 +            cur_x = 0;
 +            cur_y = 0;
-+            cur_w = (width / 2) - 1;
++            cur_w = (w1 / 2) - 1;
 +        }
 +        else if (moveresize_client->snapped_right) {
-+            cur_x = width / 2;
++            cur_x = w1 / 2;
 +            cur_y = 0;
-+            cur_w = width / 2;
++            cur_w = w1 / 2;
 +        }
 +    }
 +    else if (nm==2){
