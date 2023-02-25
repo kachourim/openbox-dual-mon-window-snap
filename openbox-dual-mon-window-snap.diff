@@ -107,7 +107,7 @@ index d12a64de..a9ad0330 100644
 +        cur_w = moveresize_client->area.width;
 +        cur_h = moveresize_client->area.height;
 +    }
-+    else if (top_snap && !moveresize_client->snapped_left && !moveresize_client->snapped_right) {
++    else if (top_snap && !moveresize_client->snapped_left && !moveresize_client->snapped_right && !moveresize_client->max_horz && !moveresize_client->max_vert) {
 +        moveresize_client->pre_max_area.width = cur_w;
 +        moveresize_client->pre_max_area.height = cur_h;
 +        moveresize_client->snapped_height = cur_h;
