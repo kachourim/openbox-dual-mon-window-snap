@@ -16,7 +16,7 @@ index 11a01400..6ec71333 100644
      gboolean skip_pager;
      /*! The window should not be displayed by taskbars */
 diff --git a/openbox/moveresize.c b/openbox/moveresize.c
-index d12a64de..a9ad0330 100644
+index d12a64de..222083cd 100644
 --- a/openbox/moveresize.c
 +++ b/openbox/moveresize.c
 @@ -40,6 +40,8 @@
@@ -37,7 +37,7 @@ index d12a64de..a9ad0330 100644
  
      if (keyboard) resist = keydist - 1; /* resist for one key press */
      else resist = config_resist_win;
-@@ -380,6 +382,171 @@ static void do_move(gboolean keyboard, gint keydist)
+@@ -380,6 +382,172 @@ static void do_move(gboolean keyboard, gint keydist)
      if (!keyboard) resist = config_resist_edge;
      resist_move_monitors(moveresize_client, resist, &cur_x, &cur_y);
  
@@ -51,6 +51,7 @@ index d12a64de..a9ad0330 100644
 +    gint w1, w2;
 +    int top_snap, top_snap_release, left_snap, right_snap, left_snap_release, right_snap_release;
 +    int pw = 5; // number of pixels to trigger snapping
++    int ems = 0; // enable middle snapping
 +
 +    if (nm==1)
 +    {
@@ -85,8 +86,8 @@ index d12a64de..a9ad0330 100644
 +            top_snap_release = (y > t2); // test if in range to release snap top
 +        }
 +
-+        left_snap  = (x >= 0 && x < pw) || (x >= w1+1 && x < w1+1+pw); // test if in range to snap left
-+        right_snap = (x > w1 - pw && x <= w1) || (x > (w1+w2)+1-pw && x <= (w1+w2)+1); // test if in range to snap right
++        left_snap  = (x >= 0 && x < pw) || ems*(x >= w1+1 && x < w1+1+pw); // test if in range to snap left
++        right_snap = (x > w1 - pw && (x <= w1)*ems) || (x > (w1+w2)+1-pw && x <= (w1+w2)+1); // test if in range to snap right
 +
 +        left_snap_release  = (x > pw && x < w1) || (x>pw+w1 && x<2*w1); // test if in range to release snap left
 +        right_snap_release = (x>w1 && x < (w1+w2)-pw) || (x>0 && x<w1-pw); // test if in range to release snap right
