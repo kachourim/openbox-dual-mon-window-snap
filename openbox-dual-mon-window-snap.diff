@@ -16,7 +16,7 @@ index 11a01400..6ec71333 100644
      gboolean skip_pager;
      /*! The window should not be displayed by taskbars */
 diff --git a/openbox/moveresize.c b/openbox/moveresize.c
-index d12a64de..222083cd 100644
+index d12a64de..dafa1075 100644
 --- a/openbox/moveresize.c
 +++ b/openbox/moveresize.c
 @@ -40,6 +40,8 @@
@@ -37,7 +37,7 @@ index d12a64de..222083cd 100644
  
      if (keyboard) resist = keydist - 1; /* resist for one key press */
      else resist = config_resist_win;
-@@ -380,6 +382,172 @@ static void do_move(gboolean keyboard, gint keydist)
+@@ -380,6 +382,174 @@ static void do_move(gboolean keyboard, gint keydist)
      if (!keyboard) resist = config_resist_edge;
      resist_move_monitors(moveresize_client, resist, &cur_x, &cur_y);
  
@@ -51,7 +51,7 @@ index d12a64de..222083cd 100644
 +    gint w1, w2;
 +    int top_snap, top_snap_release, left_snap, right_snap, left_snap_release, right_snap_release;
 +    int pw = 5; // number of pixels to trigger snapping
-+    int ems = 0; // enable middle snapping
++    int ems = 0; // 1:enable middle screen snapping, 0:disable middle screen snapping
 +
 +    if (nm==1)
 +    {
@@ -107,6 +107,8 @@ index d12a64de..222083cd 100644
 +        cur_y = y - start_y;
 +        cur_w = moveresize_client->area.width;
 +        cur_h = moveresize_client->area.height;
++        moveresize_client->snapped_right = FALSE;
++        moveresize_client->snapped_left = FALSE;
 +    }
 +    else if (top_snap && !moveresize_client->snapped_left && !moveresize_client->snapped_right && !moveresize_client->max_horz && !moveresize_client->max_vert) {
 +        moveresize_client->pre_max_area.width = cur_w;
